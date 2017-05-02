@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "FXSqlite"
-  s.version      = "1.0.0"
+  s.version      = "1.0.1"
   s.summary      = "路由框架"
 
   s.homepage     = "https://github.com/zqw87699/FXSqlite"
@@ -13,9 +13,11 @@ Pod::Spec.new do |s|
 
   s.platform     = :ios, "7.0"
 
-  s.frameworks = "Foundation", "UIKit", "sqlite3"
+  s.frameworks = "Foundation", "UIKit"
 
   s.module_name = 'FXSqlite' 
+
+  s.library = 'sqlite3'
 
   s.requires_arc = true
 
