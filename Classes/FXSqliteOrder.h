@@ -30,11 +30,13 @@
 
 /*
  *  执行sqlite3_prepare_v2
+ *  Example : insert into TMGroup (title) values (:title)
  */
 - (NSArray<FXSqliteColumn*>*)prepareSql:(NSString *)sql BindParams:(NSDictionary *)params;
 
 /*
  *  执行sqlite3_prepare_v2
+ *  Example : insert into TMGroup (title) values (?)
  */
 - (NSArray<FXSqliteColumn*>*)prepareSql:(NSString *)sql BindParamArray:(NSArray *)params;
 
@@ -42,6 +44,16 @@
  *  执行sqlite3_exec
  */
 - (int)execSql:(NSString *)sql;
+
+/*
+ *  事务执行sqlite3_exec
+ */
+- (BOOL)affairExecSql:(NSArray<NSString*>*)sql;
+
+/*
+ *  最后一个插入数据的主键
+ */
+- (NSInteger)lastInsertRowid;
 
 /*
  *  关闭数据库

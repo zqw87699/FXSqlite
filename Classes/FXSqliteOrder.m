@@ -130,6 +130,32 @@
     return result;
 }
 
+- (BOOL)affairExecSql:(NSArray<NSString *> *)sql{
+    char * errMsg = NULL;
+    int result;
+    
+    result = sqlite3_exec(_pDB, "begin;",NULL,NULL, &errMsg); //开启事务
+    if (result != SQLITE_OK) {
+        FXLogError(@"开启事务失败，错误码:%d ，错误原因:%s\n" , result, errMsg );
+        return NO;
+    }
+    for (int i = 0; i<sql.count; i++) {
+        NSString*ssql = [sql objectAtIndex:i];
+        result = sqlite3_exec(_pDB,[ssql UTF8String],NULL,NULL,&errMsg);
+        if(result != SQLITE_OK ){
+            FXLogError(@"执行SQL失败:%@,错误码:%d,错误原因:%s\n",sql,result, errMsg );
+            return NO;
+        }
+    }
+    
+    result = sqlite3_exec(_pDB, "commit;", NULL, NULL, &errMsg);
+    if (result != SQLITE_OK) {
+        FXLogError(@"提交数据失败，错误码:%d ，错误原因:%s\n" , result, errMsg );
+        return NO;
+    }
+    return YES;
+}
+
 - (BOOL)existTable:(Class)clazz{
     if (!(clazz == [FXSqliteColumn class] || [clazz isSubclassOfClass:[FXSqliteColumn class]])){
         FXLogError(@"%@未继承FXSqliteColumn",NSStringFromClass(clazz));
@@ -165,7 +191,7 @@
         }
     }
     NSArray *result = [self prepareSql:sql BindParams:valueDict];
-    if (result && result.count>0) {
+    if (result) {
         return YES;
     }
     return NO;
@@ -264,6 +290,10 @@
     }
     FXLogDebug(@"SQL:%@执行失败",sql);
     return nil;
+}
+
+- (NSInteger)lastInsertRowid{
+    return sqlite3_last_insert_rowid(_pDB);
 }
 
 - (void)closeDB{
