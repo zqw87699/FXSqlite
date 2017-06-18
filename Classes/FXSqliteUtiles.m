@@ -28,6 +28,10 @@ static NSSet *ignorePropertyNames = nil;
         return nil;
     }
     unsigned int count = 0;
+    
+    NSSet *nonJsonSet = [clazz fxNonJsonPropertys];
+    NSDictionary*jsonMap=[clazz fxPropertyToJsonPropertyDictionary];
+    
     //获取属性的列表
     objc_property_t *propertyList =  class_copyPropertyList([clazz class], &count);
     NSMutableArray *fieldArray = [[NSMutableArray alloc] init];
@@ -42,12 +46,24 @@ static NSSet *ignorePropertyNames = nil;
         
         NSString *typeName = nil;
         
-        FXSqliteField *field = [[FXSqliteField alloc] init];
-        field.name = [NSString stringWithUTF8String:property_getName(property)];
+        NSString *proName = [NSString stringWithUTF8String:property_getName(property)];
         
-        if ([ignorePropertyNames containsObject:field.name]) {
+        if ([ignorePropertyNames containsObject:proName]) {
             continue;
         }
+        
+        if ([nonJsonSet containsObject:proName]) {
+            continue;
+        }
+        
+        NSString *jsonName = jsonMap[proName];
+        if (!jsonName) {
+            jsonName = proName;
+        }
+        
+        FXSqliteField *field = [[FXSqliteField alloc] init];
+        field.name = jsonName;
+        
         if ([a1 hasPrefix:@"T@"]) {
             typeName = [[NSString alloc] initWithString:[a1 substringWithRange:NSMakeRange(2, a1.length-2)]];
             if (FX_STRING_EQUAL(typeName, @"NSString") || FX_STRING_EQUAL(typeName, @"NSMutableString")) {

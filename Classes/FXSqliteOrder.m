@@ -219,7 +219,12 @@
                         break;
                     }
                     case FXSqliteFieldTypeBlob:{
-                        NSData *data = [FXJsonUtiles toJson:value];
+                        NSData *data;
+                        @try {
+                            data = [FXJsonUtiles toJson:value];
+                        } @catch (NSException *exception) {
+                            data = [NSKeyedArchiver archivedDataWithRootObject:value];
+                        }
                         sqlite3_bind_blob(_stmt, i+1, data.bytes, (int)data.length, SQLITE_STATIC);
                         break;
                     }
@@ -268,7 +273,12 @@
                         break;
                     }
                     case FXSqliteFieldTypeBlob:{
-                        NSData *data = [FXJsonUtiles toJson:value];
+                        NSData *data;
+                        @try {
+                            data = [FXJsonUtiles toJson:value];
+                        } @catch (NSException *exception) {
+                            data = [NSKeyedArchiver archivedDataWithRootObject:value];
+                        }
                         sqlite3_bind_blob(_stmt, i+1, data.bytes, (int)data.length, SQLITE_STATIC);
                         break;
                     }
