@@ -41,11 +41,7 @@
             }
             case FXSqliteFieldTypeBlob:{
                 NSData *data = [[NSData alloc] initWithBytes:sqlite3_column_blob(stmt, fid) length:sqlite3_column_bytes(stmt, fid)];
-                @try {
-                    self.value = [FXJsonUtiles fromJsonData:data];
-                } @catch (NSException *exception) {
-                    self.value = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-                }
+                self.value = [NSKeyedUnarchiver unarchiveObjectWithData:data];
                 break;
             }
             default:
