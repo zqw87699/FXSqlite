@@ -237,8 +237,10 @@
             }
             [array addObject:column];
         }
+        sqlite3_finalize(_stmt);
         return array;
     }
+    sqlite3_finalize(_stmt);
     FXLogDebug(@"SQL:%@执行失败",sql);
     return nil;
 }
@@ -286,8 +288,10 @@
             }
             [array addObject:column];
         }
+        sqlite3_finalize(_stmt);
         return array;
     }
+    sqlite3_finalize(_stmt);
     FXLogDebug(@"SQL:%@执行失败",sql);
     return nil;
 }
@@ -297,7 +301,6 @@
 }
 
 - (void)closeDB{
-    sqlite3_free(_stmt);
     sqlite3_close(_pDB);
     sqlite3_shutdown();
 }
