@@ -29,6 +29,7 @@
         NSString*path = [[FXSqliteConfig sharedInstance] sqlitePath];
         FXLogDebug(@"%@",path);
         sqlite3_initialize();
+
         int result = sqlite3_open(path.UTF8String,&self->_pDB);
         if (result != SQLITE_OK) {
             FXLogError(@"打开数据库失败，错误码:%d" , result);
@@ -203,7 +204,7 @@
         if (params && params.count>=sqlite3_bind_parameter_count(_stmt)) {
             FXLogDebug(@"%d",sqlite3_bind_parameter_count(_stmt));
             for (int i=0;i<sqlite3_bind_parameter_count(_stmt);i++) {
-                id value = [params objectAtIndex:i];
+                id value = [[params objectAtIndex:i] copy];
                 FXSqliteFieldType type = [FXSqliteUtiles matchValueType:value];
                 switch (type) {
                     case FXSqliteFieldTypeString:{
@@ -239,10 +240,11 @@
         }
         sqlite3_finalize(_stmt);
         return array;
+    }else{
+        sqlite3_finalize(_stmt);
+        FXLogDebug(@"[Array] SQL:%@执行失败  状态:%d",sql,result);
+        return nil;
     }
-    sqlite3_finalize(_stmt);
-    FXLogDebug(@"SQL:%@执行失败",sql);
-    return nil;
 }
 
 - (NSArray<FXSqliteColumn*>*)prepareSql:(NSString *)sql BindParams:(NSDictionary *)params{
@@ -254,7 +256,7 @@
                 if (!name || ![params objectForKey:[[NSString stringWithUTF8String:name] stringByReplacingOccurrencesOfString:@":" withString:@""]]) {
                     continue;
                 }
-                id value = [params objectForKey:[[NSString stringWithUTF8String:name] stringByReplacingOccurrencesOfString:@":" withString:@""]];
+                id value = [[params objectForKey:[[NSString stringWithUTF8String:name] stringByReplacingOccurrencesOfString:@":" withString:@""]] copy];
                 FXSqliteFieldType type = [FXSqliteUtiles matchValueType:value];
                 switch (type) {
                     case FXSqliteFieldTypeString:{
@@ -290,10 +292,11 @@
         }
         sqlite3_finalize(_stmt);
         return array;
+    }else{
+        sqlite3_finalize(_stmt);
+        FXLogDebug(@"[Dict] SQL:%@执行失败  状态:%d",sql,result);
+        return nil;
     }
-    sqlite3_finalize(_stmt);
-    FXLogDebug(@"SQL:%@执行失败",sql);
-    return nil;
 }
 
 - (NSInteger)lastInsertRowid{
